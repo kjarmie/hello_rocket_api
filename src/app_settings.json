@@ -1,0 +1,10 @@
+{
+    "db": {
+        "username": "postgres",
+        "password": "Admin12345",
+        "port": 5432,
+        "hostname": "localhost",
+        "name": "rocket",
+        "max_connections": 5
+    }
+}
