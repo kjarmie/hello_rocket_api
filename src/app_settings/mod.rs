@@ -1,6 +1,11 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
+pub struct AppSettings {
+    pub db: DBSettings
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 pub struct DBSettings {
     pub username: String,
     pub password: String,

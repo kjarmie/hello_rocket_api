@@ -8,45 +8,76 @@ use std::fs;
 /* Import all necessary packages */
 // #[macro_use] extern crate rocket;
 use app::modules;
-use rocket;
+use rocket::{Rocket, Build};
 use sqlx::postgres::PgPoolOptions;
 
 /* Global Variables */
 
+fn configure(rocket:rocket::Rocket<rocket::Build>) -> rocket::Rocket<rocket::Build> {
+    /* ROUTES */    
+    rocket.mount("/", modules::home::get_routes());/* Home routes */
+
+
+    return rocket;
+}
+
 #[rocket::main]
 async fn main() -> Result<(), rocket::Error> {
+    /* CREATE ROCKET */
+    let rocket: rocket::Rocket<rocket::Build> = rocket::build();
+
+    /* CONFIGURE */    
+    rocket = configure(rocket);
+
+    /* DB  */
+
+
+    let rocket: rocket::Rocket<rocket::Ignite> = rocket()
+        .ignite().await?
+        .launch().await?;
+        
+    Ok(());
+
+
+
+
+// let _rocket: rocket::Rocket<rocket::Ignite>
+
+    /* Launch the server */
+    if let Err(e) = rocket().launch().await {
+        println!("Server failed to launched: {}", e.to_string());
+    }
+   
+    
     /* Get the db connection pool */
     let con: sqlx::Pool<sqlx::Postgres> = match db_conn().await {
         Ok(v) => v,
-        Err(e) => {
-            println!("{}", e.to_string());
-            panic!()
+        Err(err) => {
+            println!("{}", err.to_string());
+            panic!();
+            // return Err(err);
         }
     };
 
     //let con: sqlx::Pool<sqlx::Postgres> = db_conn().await;
     print!("DB connected...");
 
-    /* Launch the server */
-    let _rocket: rocket::Rocket<rocket::Ignite> = rocket::build()
-        //.mount("/", routes![hello])
-        /* Areas */
-        /* Home routes */
-        .mount("/", modules::home::get_routes())
-        .launch()
-        .await?;
-    print!("Server launched...");
+    
 
     Ok(())
 }
 
 async fn db_conn() -> Result<sqlx::Pool<sqlx::Postgres>, sqlx::Error> {
-    let data = fs::read_to_string("app_settings.json")
+    println!("{}",std::env::current_dir().unwrap().to_str().unwrap());
+
+
+    let data = fs::read_to_string("./src/app_settings.json")
         .expect("Unable to read file");
 
-    let db: app_settings::DBSettings = serde_json::from_str(&data)
+    let settings: app_settings::AppSettings = serde_json::from_str(&data)
         .expect("JSON does not have correct format.");
 
+    let db: app_settings::DBSettings = settings.db;
 
     // let url = "postgres://postgres:Admin12345@localhost:5432/rocket";
     let url = "postgres://postgres:Admin12345@localhost:5432/rocket";
@@ -67,3 +98,4 @@ async fn db_conn() -> Result<sqlx::Pool<sqlx::Postgres>, sqlx::Error> {
 
     return Ok(p);
 }
+
