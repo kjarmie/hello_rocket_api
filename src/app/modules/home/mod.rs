@@ -1,5 +1,4 @@
-use rocket::get;
-use rocket::routes;
+use rocket::{get, routes};
 
 /* Route Handlers */
 #[get("/home/index")]

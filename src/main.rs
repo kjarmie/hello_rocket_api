@@ -1,14 +1,10 @@
-/* Publish all same-level modules */
 pub mod app;
-pub mod app_settings;
-pub mod data;
+pub mod utils;
+pub mod db;
+pub mod lib;
 
 use std::fs;
-
-/* Import all necessary packages */
-// #[macro_use] extern crate rocket;
 use app::modules;
-use rocket::{Rocket, Build};
 use sqlx::postgres::PgPoolOptions;
 
 /* Global Variables */
